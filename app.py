@@ -311,6 +311,7 @@ from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.core.evaluation import FaithfulnessEvaluator
 import google.generativeai as genai
 import openai
+import random 
 
 from resources.resources import resources
 from questions import ques
@@ -795,14 +796,14 @@ def questions():
 
     questions=response_1.text.strip()
     questions = questions.replace("Suggested questions :\n", "")
-    questions = questions.replace("Suggested questions:\n", "")
-    questions = questions.replace("Suggested questions : \n", "")
-    questions = questions.replace("Suggested questions: \n", "")
-    questions = questions.replace("Suggested questions :\n\n", "")
-    questions = questions.replace("Suggested questions:\n\n", "")
-    questions = questions.replace("Suggested questions : \n\n", "")
-    questions = questions.replace("Suggested questions: \n\n", "")
-    questions = questions.replace("**Suggested questions:**\n\n", "")
+    # questions = questions.replace("Suggested questions:\n", "")
+    # questions = questions.replace("Suggested questions : \n", "")
+    # questions = questions.replace("Suggested questions: \n", "")
+    # questions = questions.replace("Suggested questions :\n\n", "")
+    # questions = questions.replace("Suggested questions:\n\n", "")
+    # questions = questions.replace("Suggested questions : \n\n", "")
+    # questions = questions.replace("Suggested questions: \n\n", "")
+    # questions = questions.replace("**Suggested questions:**\n\n", "")
     questions = remove_leading_newline(questions)
 
     
@@ -822,28 +823,15 @@ def handle_exception(e):
 
 @app.route("/suggest-questions", methods=["GET"])
 def suggest_questions():
-    static_text = """
-  The OnePlus Go tablet stands out with its 2K display that offers vibrant colors and clarity, paired with a responsive 90Hz refresh rate. It includes features like a 4G SIM card slot for calls and Wi-Fi hotspot creation, quad speakers with Dolby Atmos support, and a sleek, lightweight metal casing. Priced affordably at 20,000 rupees, it's ideal for gaming and multimedia entertainment.\n\nThe OnePlus Open is a new folding phone with a stainless steel frame, metal unibody design, and leather back. It functions both as a phone and a tablet, featuring displays with high refresh rates on both sides. It introduces multitasking capabilities with a taskbar, allowing for seamless file attachments in emails and simultaneous use of up to three applications or two games. Equipped with five cameras including a periscope zoom lens, Snapdragon 8 Gen 2 processor, 16GB RAM, and 512GB storage, it also boasts fast charging capabilities and IPX4 certification.\n\nSony's TWS WF-1000XM5 headphones offer compact, lightweight design with excellent sound quality and comfortable memory foam tips. They are IPX4 certified for water resistance and feature a smart equalizer for customizable audio preferences, along with spatial audio for immersive surround sound. Smart active noise cancellation adjusts automatically to ambient mode during conversations, and they support 24 hours of music playback with wireless charging. Available in various colors, these headphones provide premium features in eco-friendly packaging.\n\nThe Honor 90 smartphone impresses with a 200-megapixel camera and Snapdragon 7 Gen 1 processor, delivering top-notch photography and gaming performance. It boasts a seamless display and supports fast charging with a 5000 mAh battery, though the charger needs to be purchased separately. Offering unique features at its price point, it stands out in the market.\n\nThe AI-powered Paragraph AI app enhances productivity by assisting in composing responses to English chats or emails. Available on Android and iOS, this app integrates with your keyboard to facilitate easy drafting and editing of replies based on context and mood.\n\nThe itel S23 Plus features a premium design with dual curved displays and includes NFC for contactless payments. It offers WhatsApp call recording and comes with a 2-year warranty. Purchasing from Amazon includes free earbuds and a 100-day screen replacement guarantee. Priced at ₹14,000, it packs 8GB RAM, 256GB storage, and an 18W fast charger. Security features like Thrift Alert deter theft during charging, while App Lock and Dual App functionalities enhance privacy. The phone boasts a 6.7-inch AMOLED display for vivid visuals.\n\nGmail's \"confidential mode\" allows users to send emails that automatically delete after a set time, enhancing security. Available on mobile apps and PCs, this feature lets senders set an expiry date and optionally add a password, preventing unauthorized access. Emails in confidential mode cannot be forwarded, copied, printed, or downloaded, ideal for sharing sensitive information securely.\n\nThe iPhone 15 Pro introduces a titanium frame for lighter yet robust construction, replacing stainless steel. It adopts USB-C compatibility like Android phones, though the charger is not included. Users receive a braided cable matching the phone's color scheme, enhancing both functionality and aesthetics in the Pro series.\n\nUrban's Titanium smartwatch combines premium aesthetics with functionality. Featuring a large, bright touchscreen and IP67 certification, it offers continuous heart rate, SPO2, and stress monitoring, along with body temperature tracking. Users enjoy customizable watch faces, Bluetooth calling, and a magnetic charger, all complemented by a 3-4 day battery life. The watch's luxury design and versatile features make it a standout in its category.
-    """
+    shuffled_questions = ques.copy()
+    random.shuffle(shuffled_questions)
     
-    response_1 = model.generate_content(
-        f"Given this text : {static_text}. Generate five closely related suggested short questions from the given text  in this format Suggested questions : <question list in numeric pointers and single line>"
-    )
-
-    questions=response_1.text.strip()
-    questions = questions.replace("Suggested questions :\n", "")
-    questions = questions.replace("Suggested questions:\n", "")
-    questions = questions.replace("Suggested questions : \n", "")
-    questions = questions.replace("Suggested questions: \n", "")
-    questions = questions.replace("Suggested questions :\n\n", "")
-    questions = questions.replace("Suggested questions:\n\n", "")
-    questions = questions.replace("Suggested questions : \n\n", "")
-    questions = questions.replace("Suggested questions: \n\n", "")
-    questions = questions.replace("**Suggested questions:**\n\n", "")
-    questions = remove_leading_newline(questions)
-
+    formatted_questions = []
+    for index, question in enumerate(shuffled_questions):
+        formatted_questions.append(f"{index + 1}. {question['question']}")
     
-    return jsonify({"questions": questions})
+    return jsonify({"questions": "\n".join(formatted_questions)})
+
 
 # Error handling in case something goes wrong
 @app.errorhandler(Exception)
