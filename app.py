@@ -300,6 +300,7 @@
 
 import os
 from flask_cors import CORS
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, send_from_directory,abort
 import json
 from llama_index.embeddings.gemini import GeminiEmbedding
@@ -316,10 +317,11 @@ import random
 from resources.resources import resources
 from questions import ques
 
+load_dotenv()
 
 # Set your OpenAI API key
-OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
-GOOGLE_API_KEY=os.getenv("GOOGLE_API_KEY")
+OPEN_AI_API_KEY = os.environ.get("OPEN_AI_API_KEY")
+GOOGLE_API_KEY=os.environ.get("GOOGLE_API_KEY")
 
 
 
@@ -855,6 +857,9 @@ def save_to_system():
         return jsonify("error"), 500
 
 
+@app.route("/")
+def hello():
+    return "hello world"
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
